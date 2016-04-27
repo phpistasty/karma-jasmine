@@ -7,11 +7,11 @@
  * @return {Boolean}       True if external, False otherwise.
  */
 function isExternalStackEntry (entry) {
-  return (entry ? true : false) &&
-  // entries related to jasmine and karma-jasmine:
-  !/\/(jasmine-core|karma-jasmine)\//.test(entry) &&
-  // karma specifics, e.g. "at http://localhost:7018/karma.js:185"
-  !/\/(karma.js|context.html):/.test(entry)
+  return ((entry ? true : false) &&
+  !/\/(jasmine-core|karma-jasmine)\//.test(entry)
+  && !/\/(karma.js|jasmine.js|context.html):/.test(entry)
+  && !/eval at/.test(entry)
+  && !entry.indexOf('jasmine-core') > 0);
 }
 
 /**
@@ -23,7 +23,7 @@ function getRelevantStackFrom (stack) {
   var filteredStack = [],
     relevantStack = []
 
-  stack = stack.split('\n')
+  stack = stack.split('\n');
 
   for (var i = 0; i < stack.length; i += 1) {
     if (isExternalStackEntry(stack[i])) {
@@ -34,7 +34,7 @@ function getRelevantStackFrom (stack) {
   // If the filtered stack is empty, i.e. the error originated entirely from within jasmine or karma, then the whole stack
   // should be relevant.
   if (filteredStack.length === 0) {
-    filteredStack = stack
+    //filteredStack = stack // or nooope
   }
 
   for (i = 0; i < filteredStack.length; i += 1) {
